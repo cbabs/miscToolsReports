@@ -128,8 +128,14 @@ def createXls():
         dnsHostName = item[0]
         machineName = item[1][0]
         ipAddrReslv = str(item[1][2]).strip("[']")
-        dnsAlias = str(item[2])
-        
+        print(len(item))
+        if len(item) == 3:
+            dnsAlias = str(item[2])
+        else:
+            dnsAlias = "Could not resolve"
+            dnsHostName = "Could not resolve"
+            machineName = "Could not resolve"
+            ipAddrReslv = "Could not resolve"
         
         tempList = [dnsHostName, machineName, ipAddrReslv, dnsAlias]
         
