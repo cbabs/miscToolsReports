@@ -9,9 +9,10 @@ timestamp = time.ctime().replace(':', '.')
 hostList = open("hosts.txt").read().splitlines()
 
 
+# Do DNS forward lookup
 def resolveByName(hostName):
     
-    
+    #Try to do a forward lookup, if failure return could not resolve
     try:
         dnsResults = socket.gethostbyname_ex(hostName)
         cnames = socket.getfqdn(hostName)
@@ -23,7 +24,7 @@ def resolveByName(hostName):
     
     return [hostName, dnsResults, cnames]
 
-
+# Do reverse then forward lookup 
 def resolveByIp(ipAddr):
     
     try:
@@ -37,7 +38,7 @@ def resolveByIp(ipAddr):
     return resolveByName(primaryName) # Process hostname
     
     
-
+# Checks to see if ip address is valid format.  If not assumes DNS
 def checkIPv4Valid(address):
     try:
         socket.inet_pton(socket.AF_INET, address)
@@ -51,7 +52,9 @@ def checkIPv4Valid(address):
         return False
     
     return True
-    
+
+# Reads host list and if entry is valid IP
+# it will do a reverse lookup else forward
 def checkList(hostlist):
     
     retrnList = []
@@ -61,13 +64,11 @@ def checkList(hostlist):
         if checkIPv4Valid(host) is True:
             ipReslt = resolveByIp(host)
             retrnList.append(ipReslt)
-            #resolveByIp(host)
+
         else:
             hostReslt = resolveByName(host)
             retrnList.append(hostReslt)
-            
-            #resolveByName(host)
-          
+
     return retrnList
             
 #Function to create excel report
@@ -125,10 +126,12 @@ def createXls():
         
         print(item)
         
+        #Def xls row vars
         dnsHostName = item[0]
         machineName = item[1][0]
         ipAddrReslv = str(item[1][2]).strip("[']")
         
+        #If success add dns alias info to XLS row
         if len(item) == 3:
             dnsAlias = str(item[2])
         
