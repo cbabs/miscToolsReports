@@ -128,7 +128,8 @@ def createXls():
         dnsHostName = item[0]
         machineName = item[1][0]
         ipAddrReslv = str(item[1][2]).strip("[']")
-        print(len(item))
+        
+        #If unable to resolve add to all vars in list
         if len(item) == 3:
             dnsAlias = str(item[2])
         else:
