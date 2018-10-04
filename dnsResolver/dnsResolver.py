@@ -21,8 +21,6 @@ def resolveByName(hostName):
         return [hostName, dnsResults]
     
     
-    
-    
     return [hostName, dnsResults, cnames]
 
 
@@ -31,7 +29,8 @@ def resolveByIp(ipAddr):
     try:
         reslvedIp = socket.gethostbyaddr(ipAddr)
     except:
-        reslvedIp = "Could not resolve"
+        dnsResults = "Could not resolve"
+        return [ipAddr, dnsResults]
         
     primaryName = reslvedIp[0] # Get hostname
     
@@ -76,6 +75,7 @@ def createXls():
     
     #Get the dns list
     resltList = checkList(hostList)  # Process list
+
 
     
     
@@ -129,14 +129,20 @@ def createXls():
         machineName = item[1][0]
         ipAddrReslv = str(item[1][2]).strip("[']")
         
-        #If unable to resolve add to all vars in list
         if len(item) == 3:
             dnsAlias = str(item[2])
-        else:
+        
+        #If unable to resolve add to all vars in list
+        if item[1] == 'Could not resolve':
             dnsAlias = "Could not resolve"
-            dnsHostName = "Could not resolve"
+            
             machineName = "Could not resolve"
             ipAddrReslv = "Could not resolve"
+            
+        
+        
+
+            
         
         tempList = [dnsHostName, machineName, ipAddrReslv, dnsAlias]
         
