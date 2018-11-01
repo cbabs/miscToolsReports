@@ -51,7 +51,7 @@ SSH Device Type: ''')
             retrnDict = {'uid': sshUser, 'password': sshPass, 
                     'devType': devType, "tftpSrv": tftpSrv}
             if secret:
-            retrnDict['secret'] = secret
+                retrnDict['secret'] = secret
             
             return retrnDict
             break
