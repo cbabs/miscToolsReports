@@ -16,7 +16,7 @@ timestamp = time.ctime().replace(':', '.')
 hostList = open("hosts.txt").read().splitlines()
 
 # Open file with hosts
-cmdsList = open("sshCmds.txt").read().splitlines()
+#cmdsList = open("sshCmds.txt").read().splitlines()
 
 # Check files for data
 if not hostList[0]: raise("No hosts in hosts.txt file or unable to read")
@@ -33,9 +33,10 @@ SSH Device Type: ''')
         
         if devType == '': devType = 'generic_termserver'
         if devType == '?': devType = ''
-        
-
-        
+        if devType == 'cisco_asa':
+            secret = getpass.getpass('Enter Enable pass: ')
+                
+                
         sshConf = {
         'device_type': devType,
         'ip': hostList[0],
@@ -47,8 +48,12 @@ SSH Device Type: ''')
         try:
             netmiko.ConnectHandler(**sshConf)
             print("Login success")
-            return {'uid': sshUser, 'password': sshPass, 
+            retrnDict = {'uid': sshUser, 'password': sshPass, 
                     'devType': devType, "tftpSrv": tftpSrv}
+            if secret:
+            retrnDict['secret'] = secret
+            
+            return retrnDict
             break
     
         except Exception as e:
@@ -57,7 +62,7 @@ SSH Device Type: ''')
         else:
             print('Access denied')
     
-def runCommands(uid, password, devType, tftpSrv):
+def runCommands(uid, password, devType, tftpSrv, secret=None):
     
     # Log File
     f = open("sshLog-{}.txt".format(timestamp), "a")
@@ -69,6 +74,9 @@ def runCommands(uid, password, devType, tftpSrv):
             'ip': host,
             'username': uid,
             'password': password}
+        if secret:
+            sshConf['secret'] = secret
+            
         
         try:
             net_connect = netmiko.ConnectHandler(**sshConf)
@@ -79,7 +87,7 @@ def runCommands(uid, password, devType, tftpSrv):
             
         
         f.write("\n" + host)     
-        cmdsList = ('wr net {}:/{}--{}.txt' .format(tftpSrv, hostName, timestamp))
+        cmdsList = ('wr net {}:/{}--{}.txt' .format(tftpSrv, host, timestamp))
         
         sshOutput = net_connect.send_config_set(cmdsList)
         f.write(sshOutput)
