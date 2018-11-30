@@ -26,6 +26,7 @@ def getCreds():
     while True:
         sshUser = input('\n\nEnter username: ')
         sshPass = getpass.getpass('Enter password: ')
+        
         tftpSrv = input('\n\nEnter TFTP Server: ')
         devType = input('''Device Type? (Enter "?" for list.  Hit enter for generic termserver)
 SSH Device Type: ''')
@@ -42,6 +43,7 @@ SSH Device Type: ''')
         'ip': hostList[0],
         'username': sshUser,
         'password': sshPass}
+        
         
         print("Testing creds on first host in list: " + hostList[0])
         

@@ -170,10 +170,7 @@ def main():
     
     print("Reading this list: {}\n\n".format(str(hostList)))
     createXls()
-    
-    
 
-    
         
 if __name__ == '__main__':
     main()
