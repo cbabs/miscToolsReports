@@ -1,10 +1,3 @@
-
-
-'''
-wr net 10.170.67.50:/dv-136-fw01- oirwangroup-fl05-20181030-1302.txt
-
-wr net <<10.170.67.50>>:/<<hostname>><<timestamp>>.txt
-'''
 import netmiko
 import time
 import getpass
@@ -14,9 +7,6 @@ timestamp = time.ctime().replace(':', '.')
 
 # Open file with hosts
 hostList = open("hosts.txt").read().splitlines()
-
-# Open file with hosts
-#cmdsList = open("sshCmds.txt").read().splitlines()
 
 # Check files for data
 if not hostList[0]: raise("No hosts in hosts.txt file or unable to read")
@@ -29,31 +19,33 @@ def getCreds():
         
         tftpSrv = input('\n\nEnter TFTP Server: ')
         devType = input('''Device Type? (Enter "?" for list.  Hit enter for generic termserver)
-SSH Device Type: ''')
-        
+SSH Device Type: ''')    
         
         if devType == '': devType = 'generic_termserver'
         if devType == '?': devType = ''
-        if devType == 'cisco_asa':
-            secret = getpass.getpass('Enter Enable pass: ')
-                
-                
+          
         sshConf = {
         'device_type': devType,
         'ip': hostList[0],
         'username': sshUser,
         'password': sshPass}
         
+        if devType == 'cisco_asa':
+            secret = getpass.getpass('Enter Enable pass: ')        
         
         print("Testing creds on first host in list: " + hostList[0])
         
         try:
             netmiko.ConnectHandler(**sshConf)
             print("Login success")
+                
             retrnDict = {'uid': sshUser, 'password': sshPass, 
                     'devType': devType, "tftpSrv": tftpSrv}
-            if secret:
+            
+            if 'secret' in locals():
                 retrnDict['secret'] = secret
+            print(retrnDict)
+            
             
             return retrnDict
             break
@@ -76,9 +68,11 @@ def runCommands(uid, password, devType, tftpSrv, secret=None):
             'ip': host,
             'username': uid,
             'password': password}
+
+        
         if secret:
             sshConf['secret'] = secret
-            
+        
         
         try:
             net_connect = netmiko.ConnectHandler(**sshConf)
@@ -104,9 +98,13 @@ def main():
     
     credsDict = getCreds()
     
-    runCommands(credsDict['uid'], credsDict['password'],
-                 credsDict["devType"], credsDict['tftpSrv'])
-    
+    #Check for enable secret, if exist send param
+    if 'secret' in credsDict:
+        runCommands(credsDict['uid'], credsDict['password'],
+            credsDict["devType"], credsDict['tftpSrv'], credsDict['secret'])
+    else:
+        runCommands(credsDict['uid'], credsDict['password'],
+            credsDict["devType"], credsDict['tftpSrv'])
      
 
   
